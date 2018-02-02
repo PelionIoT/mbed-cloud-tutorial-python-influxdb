@@ -16,6 +16,8 @@ import argparse
 import json
 import sys
 import logging
+import time
+import threading
 
 
 from datetime import datetime
@@ -41,10 +43,6 @@ parser.add_argument("--host",
                     help="Specify the host Mbed Cloud instance to connect to.",
                     action="store", dest="host_val")
 
-parser.add_argument("--url",
-                    help="Specify self url",
-                    action="store", dest="self_url")
-
 args = parser.parse_args()
 
 # Use 'threading' async_mode, as we don't use greenlet threads for background
@@ -69,12 +67,13 @@ if args.host_val:
 
 
 WEBHOOK_URL = "%s/api/webhook" % app.config["API_BASE_URL"]
+BUTTON_RESOURCE_PATH = "/3200/0/5501"
 
 # Instatiate cloud connect
 api_config = {"api_key": app.config["API_KEY"], "host": app.config["API_HOST"]}
 connectApi = ConnectAPI(api_config)
 
-logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 # Instantiate the database client
 db = InfluxDBClient("influxdb", app.config["INFLUX_PORT"], 'root', 'root', 'example')
@@ -99,10 +98,42 @@ def device_webhook():
     # Cloud expects a return code of 200, else it will Queue up all the samples
     return Response(status=200)
 
+def handleSubscribe(device_id, path, current_value):
+    logging.info("GOT THING")
+    json_body = [
+    {
+        "measurement": "cpu_load_short",
+        "tags": {
+            "deviceId": device_id,
+            "resource": path
+        },
+        "time": datetime.utcnow(),
+        "fields": {
+            "value": current_value
+        }
+    }
+    ]
+
+    db.write_points(json_body)
+
+def subscribe_to_all():
+    time.sleep(2)
+    logging.info("Looking for devices")
+    for device in connectApi.list_connected_devices():
+        try:
+            for resource in connectApi.list_resources(device.id):
+                if resource.observable and BUTTON_RESOURCE_PATH in resource.uri:
+                    # Actually handle the subscription
+                    logging.info("Found device", device.id)
+                    connectApi.add_resource_subscription_async(device.id, BUTTON_RESOURCE_PATH, handleSubscribe)
+        except Exception:
+            pass
 if __name__ == "__main__":
+    # This should be required, why is it breaking things
+    #connectApi.start_notifications()
 
     logging.getLogger().setLevel(logging.INFO)
-    logging.info('Device Health Sampler listening at %s:%s' % (app.config["API_BASE_URL"], app.config["PORT"]))
+    logging.info('Web app listening at %s:%s' % (app.config["API_BASE_URL"], app.config["PORT"]))
     logging.getLogger().setLevel(logging.ERROR)
 
     json_body = [
@@ -124,5 +155,9 @@ if __name__ == "__main__":
 
     result = db.query('select value from cpu_load_short;')
     print("Result: {0}".format(result))
+
+
+    t = threading.Thread(target=subscribe_to_all)
+    t.start()
 
     socket.run(app, host='0.0.0.0', port=app.config["PORT"])
