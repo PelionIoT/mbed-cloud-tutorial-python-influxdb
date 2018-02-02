@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+    app:
+        build: webapp
+        ports:
+            - "3000:8080"
+        volumes:
+            - ./webapp:/usr/src/app
+        links:
+            - influxdb
+        environment:
+            - ENV=development
+
+    influxdb:
+        image: influxdb:1.4-alpine
+        expose:
+            - "8086"
+    
+    grafana:
+        image: grafana/grafana
+        ports:
+            - "3001:3000"
+        links:
+            - influxdb
+    
