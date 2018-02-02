@@ -1,6 +1,8 @@
 version: "3"
 
 services:
+    linux_client:
+        build: mbed-cloud-client-example
     app:
         build: webapp
         ports:
