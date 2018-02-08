@@ -1,17 +1,26 @@
-FROM alpine:3.6
+#FROM alpine:3.6
+FROM python:jessie
 
 MAINTAINER Michael Bartling "michael.bartling@arm.com"
 
 # Install software 
-RUN apk add --update \
+#RUN apk add --update \
+#    git \
+#    gcc \
+#    build-base \
+#    python \
+#    py-pip \
+#    python-dev \
+#    libffi-dev \
+#    openssl-dev \
+#    openssh-client 
+RUN apt-get update
+RUN apt-get install -y \
     git \
     gcc \
-    build-base \
     python \
-    py-pip \
+    python-pip \
     python-dev \
-    libffi-dev \
-    openssl-dev \
     openssh-client 
 
 # Make ssh dir
@@ -27,3 +36,5 @@ EXPOSE 8080
 
 # Run the linux client
 ENTRYPOINT ["python", "app.py"]
+#ENTRYPOINT ["python"]
+#CMD ["app.py"]

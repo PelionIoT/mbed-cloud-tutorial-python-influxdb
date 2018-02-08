@@ -3,6 +3,7 @@ version: "3"
 services:
     linux_client:
         build: mbed-cloud-client-example
+
     app:
         build: webapp
         ports:
@@ -11,8 +12,11 @@ services:
             - ./webapp:/usr/src/app
         links:
             - influxdb
+            - linux_client
         environment:
             - ENV=development
+              #entrypoint: python /usr/src/app/app.py
+              #command: python app.py
 
     influxdb:
         image: influxdb:1.4-alpine

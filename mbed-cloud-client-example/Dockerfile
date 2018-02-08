@@ -1,4 +1,5 @@
 FROM frolvlad/alpine-glibc
+#FROM ubuntu
 
 MAINTAINER Michael Bartling "michael.bartling@arm.com"
 
@@ -13,6 +14,17 @@ RUN apk add --update \
     python-dev \
     openssh-client \
     cmake
+
+#RUN apt-get update
+#RUN apt-get install -y \
+#    git \
+#    mercurial \
+#    python \
+#    python-pip \
+#    python-dev \
+#    openssh-client \
+#    cmake
+
 # Make ssh dir
 RUN mkdir /root/.ssh/
 
@@ -46,15 +58,7 @@ RUN pwd
 #RUN python pal-platform/pal-platform.py -v deploy --target=x86_x64_NativeLinux_mbedtls generate
 RUN python pal-platform/pal-platform.py fullbuild --target x86_x64_NativeLinux_mbedtls --toolchain GCC --external ./../define.txt --name mbedCloudClientExample.elf
 
-# HACKS because PAL depends on glibc magic
-#RUN sed -i 's/enum __socket_type/unsigned int/' /mbed-cloud-client-example-internal/mbed-cloud-client/mbed-client-pal/Source/Port/Reference-Impl/OS_Specific/Linux/Networking/pal_plat_network.c
-#RUN sed -i 's/sigval_t/union sigval/' /mbed-cloud-client-example-internal/mbed-cloud-client/mbed-client-pal/Source/Port/Reference-Impl/OS_Specific/Linux/RTOS/pal_plat_rtos.c
-#RUN sed -i 's/__sched_priority/sched_priority/' /mbed-cloud-client-example-internal/mbed-cloud-client/mbed-client-pal/Source/Port/Reference-Impl/OS_Specific/Linux/RTOS/pal_plat_rtos.c
-
-# Build The image
-#RUN cd __x86_x64_NativeLinux_mbedtls \
-#    && cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=./../pal-platform/Toolchain/GCC/GCC.cmake -DEXTARNAL_DEFINE_FILE=./../define.txt \
-#    && make mbedCloudClientExample.elf
 
 # Run the linux client
-CMD ["./out/Debug/mbedCloudClientExample.elf"]
+CMD ["./out/Release/mbedCloudClientExample.elf"]
+#ENTRYPOINT ["./out/Debug/mbedCloudClientExample.elf"]

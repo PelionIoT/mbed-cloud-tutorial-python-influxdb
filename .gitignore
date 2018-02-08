@@ -1,5 +1,5 @@
-.swp
-.lock
-.o
-.pyc
+*.swp
+*.lock
+*.o
+*.pyc
 

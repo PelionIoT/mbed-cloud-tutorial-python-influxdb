@@ -5,12 +5,12 @@ Second add `id_rsa.pub` and `mbed_cloud_dev_credentials.c` file to mbed-cloud-cl
 
 ```
 docker-compose build
-docker-compose up
+docker-compose up --scale linux_client=3
 ```
 
 This will spin up 4 things:
 
-1. A linux client which generates a data stream
+1. 3 linux client instances, each generating a data stream
 1. InfluxDB instance
 1. Grafana
 1. Our webapp for pushing the data stream from Mbed Cloud to InfluxDB
@@ -18,3 +18,21 @@ This will spin up 4 things:
 
 Grafana will be accessible at `http://localhost:3001`. The login credentials are admin, admin.
 ![Grafana landing page](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/master/docs/images/grafana-login.png)
+
+You can add the Influx db data source:
+* Select influxdb from dropdown
+* URL: http://influxdb:8086
+* DB: example
+* Username: root
+* Pass: root
+
+Finally we can add a dashboard
+
+1. create a graph
+1. select edit on graph title
+1. go to metrics
+1. `from default button_presses`
+1. `select field(count)`
+1. `group by tag(deviceId)`
+
+![Grafana Dash]()
