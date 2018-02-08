@@ -15,9 +15,8 @@ services:
             - linux_client
         environment:
             - ENV=development
-              #entrypoint: python /usr/src/app/app.py
-              #command: python app.py
 
+    # We can refer to the influxdb url with http://influxdb:8086
     influxdb:
         image: influxdb:1.4-alpine
         expose:

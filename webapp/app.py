@@ -13,10 +13,8 @@
 # limitations under the License.
 
 import argparse
-import json
 import sys
 import logging
-import os
 import time
 import threading
 
@@ -28,10 +26,7 @@ from influxdb import InfluxDBClient
 from os import environ
 
 from flask import Flask
-from flask import request
-from flask import Response
 
-from flask_socketio import SocketIO
 from mbed_cloud.connect import ConnectAPI
 
 # Allow for command line arguments
@@ -50,16 +45,15 @@ args = parser.parse_args()
 # threads in SDK - and thus we can't use eventlet or gevent.
 async_mode = 'threading'
 
+# Note we don't use flask in our web app but you could easily build something
+# with this framework
 app = Flask(__name__)
 
 # Get settings
 settings = import_module("settings." + environ["ENV"])
 app.config.from_object(settings.Config)
 
-#socket = SocketIO(app, async_mode=async_mode, logger=False, engineio_logger=False)
-
 # Override params with CLI inputs
-
 if args.api_key_val:
     app.config["API_KEY"] = args.api_key_val
 
@@ -78,48 +72,34 @@ connectApi.start_notifications()
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-# Instantiate the database client
-db = InfluxDBClient("influxdb", app.config["INFLUX_PORT"], 'root', 'root', 'example')
+# Instantiate the database client on Table named 'example'
+# Set the username and password to root
+db = InfluxDBClient("influxdb",
+                    app.config["INFLUX_PORT"],
+                    'root', 'root', 'example')
 
-def handle_device_webhook(data):
-    # find all data samples in notification queue
-
-    # put data in influxdb
-
-    if r.ok == False:
-        logging.error("LOG FAIL", r.status_code,  data)
-
-@app.route('/handle_webhook', methods=['PUT'])
-def device_webhook():
-    """If a new device gets added make sure a subscription 
-    is added to eagle owl.
-    """
-    data = json.loads(request.data)
-    handle_device_webhook(data)
-
-    # It's ok to drop samples
-    # Cloud expects a return code of 200, else it will Queue up all the samples
-    return Response(status=200)
 
 def handleSubscribe(device_id, path, current_value):
-    logging.warning("GOT THING")
+    """On change in subscribed resource, dump data to InfluxDB."""
     json_body = [
-    {
-        "measurement": "button_presses",
-        "tags": {
-            "deviceId": device_id,
-            "resource": path
-        },
-        "time": datetime.utcnow(),
-        "fields": {
-            "count": current_value
+        {
+            "measurement": "button_presses",
+            "tags": {
+                "deviceId": device_id,
+                "resource": path
+            },
+            "time": datetime.utcnow(),
+            "fields": {
+                "count": current_value
+            }
         }
-    }
     ]
 
     db.write_points(json_body)
 
+
 def subscribe_to_all():
+    """Find all devices with button resources and subscribe to them."""
     time.sleep(2)
     logging.warning("Looking for devices")
     print("Looking for devices")
@@ -130,10 +110,16 @@ def subscribe_to_all():
                 if BUTTON_RESOURCE_PATH == resource.path:
                     # Actually handle the subscription
                     logging.warning("Found device %s" % device.id)
-                    connectApi.add_resource_subscription_async(device.id, BUTTON_RESOURCE_PATH, handleSubscribe)
+                    connectApi.add_resource_subscription_async(device.id,
+                                                               BUTTON_RESOURCE_PATH,
+                                                               handleSubscribe)
 
                     # Go ahead and store current value
-                    handleSubscribe(device.id, resource.path, connectApi.get_resource_value(device.id, resource.path))
+                    handleSubscribe(device.id, resource.path,
+                                    connectApi.get_resource_value(device.id,
+                                                                  resource.path
+                                                                  )
+                                    )
 
         except:
             logging.warning("Failed to get resources for %s, likely offline" % device.id)
@@ -151,4 +137,3 @@ if __name__ == "__main__":
 
     while True:
         pass
-    #socket.run(app, host='0.0.0.0', port=app.config["PORT"])
