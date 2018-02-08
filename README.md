@@ -21,10 +21,12 @@ Grafana will be accessible at `http://localhost:3001`. The login credentials are
 
 You can add the Influx db data source:
 * Select influxdb from dropdown
-* URL: http://influxdb:8086
+* URL: http://influxdb:8086 <--- Docker automatically handles the resolution from influxdb to its url according to its label in the docker-compose script
 * DB: example
 * Username: root
 * Pass: root
+
+![Grafana Dash](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/master/docs/images/grafana-data-source.png)
 
 Finally we can add a dashboard
 
@@ -35,4 +37,4 @@ Finally we can add a dashboard
 1. `select field(count)`
 1. `group by tag(deviceId)`
 
-![Grafana Dash]()
+![Grafana Dash](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/master/docs/images/grafana-dash.png)
