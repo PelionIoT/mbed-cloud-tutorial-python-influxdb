@@ -62,7 +62,8 @@ if args.host_val:
 
 
 WEBHOOK_URL = "%s/api/webhook" % app.config["API_BASE_URL"]
-BUTTON_RESOURCE_PATH = "/3200/0/5501"
+PRODUCT_ID_PATH = "/10341/0/26341"
+PRODUCT_CURR_COUNT_PATH = "/10341/0/26342"
 
 # Instatiate cloud connect
 api_config = {"api_key": app.config["API_KEY"], "host": app.config["API_HOST"]}
@@ -79,15 +80,39 @@ db = InfluxDBClient("influxdb",
                     'root', 'root', 'example')
 
 
+def get_async(device_id, resource_path):
+    while True:
+        async_resp = connectApi.get_resource_value_async(
+                device_id, resource_path)
+
+        # Busy wait - block the thread and wait for the response to finish.
+        while not async_resp.is_done:
+            time.sleep(0.1)
+
+        # Check if we have a async error response, and abort if it is.
+        if async_resp.error:
+            raise Exception("Got async error response: %r" % async_resp.error)
+
+        # Get the value from the async response, as we know it's done
+        return async_resp.value
+
+
 def handleSubscribe(device_id, path, current_value):
     """On change in subscribed resource, dump data to InfluxDB."""
+    logging.error("HERE %s" % device_id)
+    id_num = connectApi.get_resource_value(device_id, PRODUCT_ID_PATH, timeout=5)
+    #id_num = get_async(device_id, PRODUCT_ID_PATH)
+    logging.warning("DONE GETTING VALUE %s %s" % (device_id, id_num))
+    import pdb; pdb.set_trace()
+
     json_body = [
         {
-            "measurement": "button_presses",
+            "measurement": "product_count",
             "tags": {
                 "deviceId": device_id,
-                "resource": path
-            },
+                "resource": path,
+                "product_id": id_num
+                },
             "time": datetime.utcnow(),
             "fields": {
                 "count": current_value
@@ -95,37 +120,45 @@ def handleSubscribe(device_id, path, current_value):
         }
     ]
 
+    logging.error("Writing to DB")
     db.write_points(json_body)
 
 
 def subscribe_to_all():
     """Find all devices with button resources and subscribe to them."""
-    time.sleep(2)
+    time.sleep(5)
     logging.warning("Looking for devices")
     print("Looking for devices")
-    for device in connectApi.list_connected_devices():
+    for device in connectApi.list_connected_devices(order='desc'):
+        resources = []
         try:
+            # check if accessible
+            connectApi.get_resource_value(device.id,
+                                          "/3/0/2",
+                                          timeout=5)
             resources = connectApi.list_resources(device.id)
-            for resource in resources:
-                if BUTTON_RESOURCE_PATH == resource.path:
-                    # Actually handle the subscription
-                    logging.warning("Found device %s" % device.id)
-                    connectApi.add_resource_subscription_async(device.id,
-                                                               BUTTON_RESOURCE_PATH,
-                                                               handleSubscribe)
-
-                    # Go ahead and store current value
-                    handleSubscribe(device.id, resource.path,
-                                    connectApi.get_resource_value(device.id,
-                                                                  resource.path
-                                                                  )
-                                    )
-
         except:
             logging.warning("Failed to get resources for %s, likely offline" % device.id)
+            continue
+        for resource in resources:
+            if PRODUCT_CURR_COUNT_PATH == resource.path:
+                # Actually handle the subscription
+                logging.warning("Found device %s" % device.id)
+                connectApi.add_resource_subscription_async(device.id,
+                                                           PRODUCT_CURR_COUNT_PATH,
+                                                           handleSubscribe)
+
+                #current_val = connectApi.get_resource_value(device.id,
+                #                                            resource.path
+                #                                            )
+                #logging.warning("About to handle subscribe")
+                ## Go ahead and store current value
+                ##dummy(device.id, resource.path, current_val)
+                #handleSubscribe(device.id, resource.path, current_val)
+
+
 
 if __name__ == "__main__":
-
     logging.getLogger().setLevel(logging.INFO)
     logging.info('Web app listening at %s:%s' % (app.config["API_BASE_URL"], app.config["PORT"]))
     logging.getLogger().setLevel(logging.WARNING)
@@ -136,4 +169,4 @@ if __name__ == "__main__":
     t.start()
 
     while True:
-        pass
+        continue
