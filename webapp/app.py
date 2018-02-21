@@ -21,25 +21,25 @@ import threading
 
 from datetime import datetime
 from importlib import import_module
-from influxdb import InfluxDBClient
+# from influxdb import InfluxDBClient
 
 from os import environ
 
-from flask import Flask
+# from flask import Flask
 
 from mbed_cloud.connect import ConnectAPI
 
 # Allow for command line arguments
-parser = argparse.ArgumentParser()
-
-parser.add_argument("--apiKey",
-                    help="Provide an api key directly",
-                    action="store", dest="api_key_val")
-parser.add_argument("--host",
-                    help="Specify the host Mbed Cloud instance to connect to.",
-                    action="store", dest="host_val")
-
-args = parser.parse_args()
+# parser = argparse.ArgumentParser()
+#
+# parser.add_argument("--apiKey",
+#                     help="Provide an api key directly",
+#                     action="store", dest="api_key_val")
+# parser.add_argument("--host",
+#                     help="Specify the host Mbed Cloud instance to connect to.",
+#                     action="store", dest="host_val")
+#
+# args = parser.parse_args()
 
 # Use 'threading' async_mode, as we don't use greenlet threads for background
 # threads in SDK - and thus we can't use eventlet or gevent.
@@ -47,27 +47,27 @@ async_mode = 'threading'
 
 # Note we don't use flask in our web app but you could easily build something
 # with this framework
-app = Flask(__name__)
+# app = Flask(__name__)
 
 # Get settings
-settings = import_module("settings." + environ["ENV"])
-app.config.from_object(settings.Config)
+# settings = import_module("settings." + environ["ENV"])
+# app.config.from_object(settings.Config)
 
 # Override params with CLI inputs
-if args.api_key_val:
-    app.config["API_KEY"] = args.api_key_val
+# if args.api_key_val:
+#     app.config["API_KEY"] = args.api_key_val
+#
+# if args.host_val:
+#     app.config["API_HOST"] = args.host_val
 
-if args.host_val:
-    app.config["API_HOST"] = args.host_val
 
-
-WEBHOOK_URL = "%s/api/webhook" % app.config["API_BASE_URL"]
+# WEBHOOK_URL = "%s/api/webhook" % app.config["API_BASE_URL"]
 PRODUCT_ID_PATH = "/10341/0/26341"
 PRODUCT_CURR_COUNT_PATH = "/10341/0/26342"
 
 # Instatiate cloud connect
-api_config = {"api_key": app.config["API_KEY"], "host": app.config["API_HOST"]}
-connectApi = ConnectAPI(api_config)
+# api_config = {"api_key": app.config["API_KEY"], "host": app.config["API_HOST"]}
+connectApi = ConnectAPI()
 # This should be required, why is it breaking things
 connectApi.start_notifications()
 
@@ -75,9 +75,9 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 # Instantiate the database client on Table named 'example'
 # Set the username and password to root
-db = InfluxDBClient("influxdb",
-                    app.config["INFLUX_PORT"],
-                    'root', 'root', 'example')
+# db = InfluxDBClient("influxdb",
+#                     app.config["INFLUX_PORT"],
+#                     'root', 'root', 'example')
 
 
 def get_async(device_id, resource_path):
@@ -134,10 +134,11 @@ def subscribe_to_all():
         try:
             # check if accessible
             connectApi.get_resource_value(device.id,
-                                          "/3/0/2",
+                                          "/3/0/0",
                                           timeout=5)
             resources = connectApi.list_resources(device.id)
         except:
+            logging.exception('hmm')
             logging.warning("Failed to get resources for %s, likely offline" % device.id)
             continue
         for resource in resources:
@@ -160,13 +161,13 @@ def subscribe_to_all():
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.INFO)
-    logging.info('Web app listening at %s:%s' % (app.config["API_BASE_URL"], app.config["PORT"]))
+    # logging.info('Web app listening at %s:%s' % (app.config["API_BASE_URL"], app.config["PORT"]))
     logging.getLogger().setLevel(logging.WARNING)
 
-    db.create_database('example')
+    # db.create_database('example')
 
-    t = threading.Thread(target=subscribe_to_all)
-    t.start()
+    subscribe_to_all()
 
+    import time
     while True:
-        continue
+        time.sleep(1)
