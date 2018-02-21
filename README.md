@@ -1,7 +1,7 @@
 # Mbed Cloud timeseries database tutorial
 
 First add your `API_KEY` to `webapp/settings/developement.py`
-Second add `id_rsa.pub` and `mbed_cloud_dev_credentials.c` file to mbed-cloud-client-example directory
+Second add `id_rsa` private key file and `mbed_cloud_dev_credentials.c` file to mbed-cloud-client-example directory
 
 ```
 docker-compose build

@@ -4,6 +4,7 @@ MAINTAINER Michael Bartling "michael.bartling@arm.com"
 
 # Install software 
 RUN apk add --update \
+    rng-tools \
     git \
     mercurial \
     python \

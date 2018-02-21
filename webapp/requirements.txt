@@ -1,5 +1,5 @@
 pip>=8.0.0
-mbed-cloud-sdk>=1.2.3.0
+mbed-cloud-sdk>=1.2.5.0
 pybars3>=0.5.0
 Flask>=0.10.1
 Flask-Testing>=0.7.1

@@ -79,6 +79,7 @@ db = InfluxDBClient("influxdb",
                     app.config["INFLUX_PORT"],
                     'root', 'root', 'example')
 
+id_num_db = {}
 
 def get_async(device_id, resource_path):
     while True:
@@ -96,14 +97,21 @@ def get_async(device_id, resource_path):
         # Get the value from the async response, as we know it's done
         return async_resp.value
 
+def get_async_time(device_id, resource_path, timeout=0):
+    deferred = connectApi.get_resource_value_async(device_id, resource_path)
+    return deferred.wait(timeout)
+
 
 def handleSubscribe(device_id, path, current_value):
     """On change in subscribed resource, dump data to InfluxDB."""
     logging.error("HERE %s" % device_id)
-    id_num = connectApi.get_resource_value(device_id, PRODUCT_ID_PATH, timeout=5)
+    now = datetime.utcnow()
+    #id_num = connectApi.get_resource_value(device_id, PRODUCT_ID_PATH, timeout=5)
+    #id_num = get_async_time(device_id, PRODUCT_ID_PATH, timeout=15)
+    id_num = id_num_db[device_id]
     #id_num = get_async(device_id, PRODUCT_ID_PATH)
-    logging.warning("DONE GETTING VALUE %s %s" % (device_id, id_num))
-    import pdb; pdb.set_trace()
+    logging.error("DONE GETTING VALUE %s %s" % (device_id, id_num))
+    #import pdb; pdb.set_trace()
 
     json_body = [
         {
@@ -113,7 +121,7 @@ def handleSubscribe(device_id, path, current_value):
                 "resource": path,
                 "product_id": id_num
                 },
-            "time": datetime.utcnow(),
+            "time": now,
             "fields": {
                 "count": current_value
             }
@@ -129,7 +137,7 @@ def subscribe_to_all():
     time.sleep(5)
     logging.warning("Looking for devices")
     print("Looking for devices")
-    for device in connectApi.list_connected_devices(order='desc'):
+    for device in connectApi.list_connected_devices():
         resources = []
         try:
             # check if accessible
@@ -144,6 +152,7 @@ def subscribe_to_all():
             if PRODUCT_CURR_COUNT_PATH == resource.path:
                 # Actually handle the subscription
                 logging.warning("Found device %s" % device.id)
+                id_num_db[device.id] = connectApi.get_resource_value(device.id, PRODUCT_ID_PATH, timeout=5)
                 connectApi.add_resource_subscription_async(device.id,
                                                            PRODUCT_CURR_COUNT_PATH,
                                                            handleSubscribe)
