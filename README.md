@@ -1,27 +1,30 @@
-# Mbed Cloud timeseries database tutorial
+# Mbed Cloud Time-series Database Tutorial
 
-First add your `API_KEY` to `webapp/settings/developement.py`
-Second add `id_rsa.pub` and `mbed_cloud_dev_credentials.c` file to mbed-cloud-client-example directory
+## Setup
+
+1. Add your Mbed Cloud `API_KEY` to `webapp/settings/development.py`.
+1. Add your `id_rsa` and `mbed_cloud_dev_credentials.c` file to the mbed-cloud-client-example directory
+1. Now run the following:
 
 ```
 docker-compose build
 docker-compose up --scale linux_client=3
 ```
 
-This will spin up 4 things:
+This will spin up 4 items:
 
 1. 3 linux client instances, each generating a data stream
 1. InfluxDB instance
 1. Grafana
-1. Our webapp for pushing the data stream from Mbed Cloud to InfluxDB
+1. The web application for pushing the data stream from Mbed Cloud to InfluxDB
 
 
 Grafana will be accessible at `http://localhost:3001`. The login credentials are admin, admin.
 ![Grafana landing page](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/master/docs/images/grafana-login.png)
 
 You can add the Influx db data source:
-* Select influxdb from dropdown
-* URL: http://influxdb:8086 <--- Docker automatically handles the resolution from influxdb to its url according to its label in the docker-compose script
+* Select InfluxDB from dropdown
+* URL: http://influxdb:8086 <--- Docker automatically handles the resolution from InfluxDB to its url according to its label in the docker-compose script
 * DB: example
 * Username: root
 * Pass: root
@@ -30,11 +33,11 @@ You can add the Influx db data source:
 
 Finally we can add a dashboard
 
-1. create a graph
-1. select edit on graph title
-1. go to metrics
-1. `from default button_presses`
-1. `select field(count)`
-1. `group by tag(deviceId)`
+1. Create a graph
+1. Select edit on graph title
+1. Go to metrics and add the following:
+  - FROM: `default button_presses`
+  - SELECT: `field(count)`
+  - GROUP: `tag(deviceId)`
 
 ![Grafana Dash](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/master/docs/images/grafana-dash.png)
