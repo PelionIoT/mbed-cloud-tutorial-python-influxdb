@@ -137,7 +137,7 @@ def subscribe_to_all():
     time.sleep(5)
     logging.warning("Looking for devices")
     print("Looking for devices")
-    for device in connectApi.list_connected_devices():
+    for device in connectApi.list_connected_devices(order='desc'):
         resources = []
         try:
             # check if accessible
@@ -174,8 +174,9 @@ if __name__ == "__main__":
 
     db.create_database('example')
 
-    t = threading.Thread(target=subscribe_to_all)
-    t.start()
+    #t = threading.Thread(target=subscribe_to_all)
+    #t.start()
+    subscribe_to_all()
 
     while True:
         continue
