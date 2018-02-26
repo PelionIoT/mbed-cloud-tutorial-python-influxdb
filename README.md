@@ -3,10 +3,19 @@
 ## Introduction
 A retail chain wants more insight in how product placement correlates to customer interaction. 
 Each shelf tracks how many items it contains, and should send this information to a server every time an item is added or removed.
-The retailer does not care about how many products are sold to customers as this is trivially found from checkout systems. 
-Instead they want metrics on how much customers interact with products in their store before deciding to purchase or return to the shelves.
+Note: The retailer does not care about how many products are sold to customers as this is trivially found from checkout systems. 
+Instead they want metrics on how much customers interact with products in stores before deciding to purchase or return an item to the shelves.
+![Shopping](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/cola/docs/images/shopping.png)
 
-## Setup
+## Structuring the workflow
+
+### Scoping
+
+### Capturing the structure in Docker
+
+### High level overview of the proxy sampling application
+
+## Setup and run
 
 1. Add your Mbed Cloud `API_KEY` to `webapp/settings/development.py`.
 1. Add your `id_rsa` and `mbed_cloud_dev_credentials.c` file to the mbed-cloud-client-example directory
