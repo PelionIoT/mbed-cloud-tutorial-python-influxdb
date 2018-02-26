@@ -10,6 +10,20 @@ Instead they want metrics on how much customers interact with products in stores
 ## Structuring the workflow
 
 ### Scoping
+For now, lets assume the data streams are readily available from cloud. In other words, there exist some devices connected to Mbed Cloud that provide the following in addition to the standard LWM2M objects:
+
+* Product ID    (integer)
+* Product count (integer)
+* Product empty (boolean)
+
+It is important to note that multiple shelves can share the same product ID so we need to capture this in our final metric through some aggregation stage.
+Obviously, we want to keep track of the product counts for each product ID over time so we should probably store these readings in a time series database.
+Additionally, we need to present these readings in a meaningful way to the analysts through some form of visualization.
+Here we arbitrarily pick InfluxDB for storing our time series values and Grafana for visualization, but we could have chosen from any combination of time series databases and visualization platforms.
+The third, and final, piece we need is a custom proxy application to take the data streams from Mbed Cloud and push them into the time series database.
+
+
+![Platform overview](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/cola/docs/images/cola-overview.png)
 
 ### Capturing the structure in Docker
 
