@@ -106,12 +106,8 @@ def handleSubscribe(device_id, path, current_value):
     """On change in subscribed resource, dump data to InfluxDB."""
     logging.error("HERE %s" % device_id)
     now = datetime.utcnow()
-    #id_num = connectApi.get_resource_value(device_id, PRODUCT_ID_PATH, timeout=5)
-    #id_num = get_async_time(device_id, PRODUCT_ID_PATH, timeout=15)
     id_num = id_num_db[device_id]
-    #id_num = get_async(device_id, PRODUCT_ID_PATH)
     logging.error("DONE GETTING VALUE %s %s" % (device_id, id_num))
-    #import pdb; pdb.set_trace()
 
     json_body = [
         {
@@ -156,16 +152,6 @@ def subscribe_to_all():
                 connectApi.add_resource_subscription_async(device.id,
                                                            PRODUCT_CURR_COUNT_PATH,
                                                            handleSubscribe)
-
-                #current_val = connectApi.get_resource_value(device.id,
-                #                                            resource.path
-                #                                            )
-                #logging.warning("About to handle subscribe")
-                ## Go ahead and store current value
-                ##dummy(device.id, resource.path, current_val)
-                #handleSubscribe(device.id, resource.path, current_val)
-
-
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.INFO)
