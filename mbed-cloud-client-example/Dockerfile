@@ -33,7 +33,7 @@ RUN pip install mbed-cli click
 
 # Configure Git 
 RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
-RUN git clone https://github.com/mbartling/cola-tutorial.git
+RUN git clone https://github.com/armmbed/cola-tutorial.git
 WORKDIR /cola-tutorial
 
 # Size Helping as these are not used in Linux
