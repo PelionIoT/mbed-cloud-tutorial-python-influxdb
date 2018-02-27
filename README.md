@@ -25,9 +25,21 @@ The third, and final, piece we need is a custom proxy application to take the da
 
 ![Platform overview](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/cola/docs/images/cola-overview.png)
 
-### Capturing the structure in Docker
+### Capturing the structure in microservices
 
 ### High level overview of the proxy sampling application
+
+```python
+# Subscribe to all devices at runtime
+Initialize():
+    for each device in connected_devices():
+        if has_product_count_resource(device):
+            add_resource_subscription(device, PRODUCT_COUNT_PATH, product_count_callback)
+
+# Push current value and product_id to the database
+product_count_callback(device_id, path, current_value):
+    TimeSeriesDatabase.push((device_id, current_value, get_product_id(device_id)))
+```
 
 ## Setup and run
 
