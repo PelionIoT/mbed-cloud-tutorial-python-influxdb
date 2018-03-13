@@ -81,27 +81,6 @@ db = InfluxDBClient("influxdb",
 
 id_num_db = {}
 
-def get_async(device_id, resource_path):
-    while True:
-        async_resp = connectApi.get_resource_value_async(
-                device_id, resource_path)
-
-        # Busy wait - block the thread and wait for the response to finish.
-        while not async_resp.is_done:
-            time.sleep(0.1)
-
-        # Check if we have a async error response, and abort if it is.
-        if async_resp.error:
-            raise Exception("Got async error response: %r" % async_resp.error)
-
-        # Get the value from the async response, as we know it's done
-        return async_resp.value
-
-def get_async_time(device_id, resource_path, timeout=0):
-    deferred = connectApi.get_resource_value_async(device_id, resource_path)
-    return deferred.wait(timeout)
-
-
 def handleSubscribe(device_id, path, current_value):
     """On change in subscribed resource, dump data to InfluxDB."""
     logging.error("HERE %s" % device_id)
