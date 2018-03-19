@@ -66,7 +66,7 @@ services:
 
 This file declares 4 services: a proxy web app, InfluxDB, Grafana, and an mbed Cloud Client Linux example. For InfluxDB and Grafana, we specify which images to grab from DockerHub. Note the project structure is evident in the `links` keyword. For example, the `app` service depends on both the `influxdb` service and `linux_client` service. Likewise, the `grafana` service pulls data from the `influxdb` service. Finally, the `grafana` service is visible on port 3001.
 
-### High level overview of the proxy sampling application
+### Writing a proxy sampling application based on subscriptions
 
 ```python
 # Subscribe to all devices at runtime
@@ -125,7 +125,10 @@ This metric roughly translates as follows: First count the number of interaction
 
 ![Grafana Dash](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/cola/docs/images/grafana-cola.png)
 
+## Discussion
+
 ## References
 
+* [Mbed Cloud](https://cloud.mbed.com/docs/v1.2/introduction/index.html)
 * [InluxDB](https://www.influxdata.com/time-series-platform/influxdb/)
 * [Grafana](https://grafana.com/)
