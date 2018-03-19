@@ -4,6 +4,7 @@ MAINTAINER Michael Bartling "michael.bartling@arm.com"
 
 # Install software 
 RUN apk add --update \
+    rng-tools \
     git \
     mercurial \
     python \
@@ -32,8 +33,8 @@ RUN pip install mbed-cli click
 
 # Configure Git 
 RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
-RUN git clone https://github.com/armmbed/mbed-cloud-client-example-restricted
-WORKDIR /mbed-cloud-client-example-restricted
+RUN git clone https://github.com/armmbed/cola-tutorial.git
+WORKDIR /cola-tutorial
 
 # Size Helping as these are not used in Linux
 RUN rm easy-connect.lib
