@@ -84,6 +84,7 @@ def product_count_callback(device_id, path, current_value):
 
 1. Add your Mbed Cloud `API_KEY` to `webapp/settings/development.py`.
 1. AGdd your `id_rsa` and `mbed_cloud_dev_credentials.c` file to the mbed-cloud-client-example directory
+
 1. Now run the following:
 
 ```
