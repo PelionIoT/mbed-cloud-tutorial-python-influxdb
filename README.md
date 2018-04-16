@@ -7,6 +7,11 @@ Note: The retailer does not care about how many products are sold to customers a
 Instead they want metrics on how much customers interact with products in stores before deciding to purchase or return an item to the shelves.
 ![Shopping](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/cola/docs/images/shopping.png)
 
+## Prerequisites 
+
+- [Docker](https://docs.docker.com/install/#supported-platforms)
+
+Note for Windows users, you may need to enable [Shard Drives](https://docs.docker.com/docker-for-windows/#shared-drives) for Docker to work correctly.
 ## Structuring the workflow
 
 ### Scoping
@@ -85,7 +90,7 @@ def product_count_callback(device_id, path, current_value):
 1. Add your Mbed Cloud `API_KEY` to `webapp/settings/development.py`.
 1. Add your `id_rsa` and `mbed_cloud_dev_credentials.c` file to the mbed-cloud-client-example directory. [Generate id_rsa](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/#platform-windows) and be sure to add it to Github. You can get `mbed_cloud_dev_credentials.c` from the cloud portal. *NOTE*: please make sure `id_rsa` is not password protected.
 
-1. Now run the following:
+1. Now run the following in the root of your project:
 
 ```
 docker-compose build
