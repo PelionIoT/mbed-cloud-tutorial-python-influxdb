@@ -13,5 +13,5 @@ class Config(BaseConfig):
     
     # Cloud credentials
     API_KEY = "CLOUD_ACCESS_KEY"
-    #API_HOST = "CLOUD_API_HOST"
+    API_HOST = "https://api.us-east-1.mbedcloud.com"
 
