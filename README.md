@@ -7,12 +7,14 @@ Note: The retailer does not care about how many products are sold to customers a
 Instead they want metrics on how much customers interact with products in stores before deciding to purchase or return an item to the shelves.
 ![Shopping](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/cola/docs/images/shopping.png)
 
+In this tutorial we will BLAH
+
 ## Prerequisites 
 
 - [Docker](https://docs.docker.com/install/#supported-platforms)
 
-Note for Windows users, you may need to enable [Shard Drives](https://docs.docker.com/docker-for-windows/#shared-drives) for Docker to work correctly.
-## Structuring the workflow
+Note for Windows users, you may need to enable [Shared Drives](https://docs.docker.com/docker-for-windows/#shared-drives) for Docker to work correctly.
+## Structuring the time-series workflow 
 
 ### Scoping
 For now, lets assume the data streams are readily available from cloud. In other words, there exist some devices connected to Mbed Cloud that provide the following in addition to the standard LWM2M objects:
@@ -21,20 +23,27 @@ For now, lets assume the data streams are readily available from cloud. In other
 * Product count (integer)
 
 It is important to note that multiple shelves can share the same product ID so we need to capture this in our final metric through some aggregation stage.
-Obviously, we want to keep track of the product counts for each product ID over time so we should probably store these readings in a time series database.
+Obviously, we want to keep track of the product counts for each product ID over time so we should probably store these readings in a time series database. 
+However, to do this we need a custom proxy application that takes the data streams from Mbed Cloud and pushes them into a time series database.
 Additionally, we need to present these readings in a meaningful way to the analysts through some form of visualization.
 Here we arbitrarily pick InfluxDB for storing our time series values and Grafana for visualization, but we could have chosen from any combination of time series databases and visualization platforms.
-The third, and final, piece we need is a custom proxy application to take the data streams from Mbed Cloud and push them into the time series database.
 
 
 ![Platform overview](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/cola/docs/images/cola-overview.png)
 
-### Capturing the structure in microservices
+### Capturing this structure in microservices
 
 Microservice architectures are modular applications where subcomponents are built up as loosely coupled, and reusable, services. Given a standard interface, for example, the same description for a SQL database microservice can be used in just about any application. Furthermore microservice architectures benefit additionally from straightforward deployment scenarios and controllable service scaling. 
 
-Docker is one of many solutions for building microservice based applications. Microservices themselves are described using `Dockerfile`s, which include information such as how to build and run a specific service, and what ports are needed to connect to it. This application has two `Dockerfile`s, one for the proxy web application and one for a locallinux client found in `webapp/Dockerfile` and `mbed-cloud-client-example/Dockerfile` respectively. 
-Docker captures application structure in `docker-compose.yml` files, which declare which microservices are needed in an application and how to connect them. For example, we can directly map the Platform Overview Diagram from the `Scoping` section to a Docker application with the following compose script:
+Docker is one of many solutions for building microservice based applications. In our example service, we will partition the work into 4 microservices:
+- `linux_client`: An example client that generates data streams
+- `app`: A proxy web application that receives data from Mbed Cloud and forwards the data to a InfluxDB
+- `influxdb`: An instance of the InfluxDB time series database
+- `grafana`: A data visualization engine
+
+Microservices themselves are described using `Dockerfile`s, which include information such as how to build and run a specific service, and what ports are needed to connect to it. This application has two `Dockerfile`s, one for the proxy web application and one for a local linux client found in `webapp/Dockerfile` and `mbed-cloud-client-example/Dockerfile` respectively. 
+Docker captures application structure in `docker-compose.yml` files, which declare which microservices are needed in an application and how to connect them. 
+For our example system we use the following compose script:
 
 ```
 version: "3"
@@ -69,10 +78,10 @@ services:
             - influxdb
 ```
 
-This file declares 4 services: a proxy web app, InfluxDB, Grafana, and an mbed Cloud Client Linux example. For InfluxDB and Grafana, we specify which images to grab from DockerHub. Note the project structure is evident in the `links` keyword. For example, the `app` service depends on both the `influxdb` service and `linux_client` service. Likewise, the `grafana` service pulls data from the `influxdb` service. Finally, the `grafana` service is visible on port 3001.
+For InfluxDB and Grafana, we do not need to specify Dockerfiles as these are made public on DockerHub, and Docker will pull these automatically on build. Note the project structure is evident in the `links` keyword. For example, the `app` service depends on both the `influxdb` service and `linux_client` service. Likewise, the `grafana` service pulls data from the `influxdb` service. Finally, the `grafana` service is visible on port 3001.
 
 ### Writing a proxy sampling application based on subscriptions
-
+For an introduction to building web applications around Mbed Cloud look [here]()
 ```python
 # Subscribe to all devices at runtime
 def Initialize():
@@ -99,10 +108,10 @@ docker-compose up --scale linux_client=3
 
 This will spin up 4 items:
 
-1. 3 linux client instances, each generating a data stream
+1. 3 linux client instances, each generating a data stream simulating a product on a shelf
+1. The proxy web application for pushing the data stream from Mbed Cloud to InfluxDB
 1. InfluxDB instance
-1. Grafana
-1. The web application for pushing the data stream from Mbed Cloud to InfluxDB
+1. Grafana, where all the data aggregation and visualization happens
 
 
 Grafana will be accessible at `http://localhost:3001`. The login credentials are admin, admin.
@@ -127,7 +136,7 @@ Finally we can add a dashboard
   - GROUP BY: `time(1s) tag(product_id) fill(previous)`
   - ALIAS BY: `$tag_product_id`
 
-This metric roughly translates as follows: First count the number of interactions with a product (product taken, product returned) during a 1 second interval. This can be thought of as the magnitude of the product activity, which is useful in understanding how much activity a particular shelf has. However, additionally computing the non-negative difference between these magnitudes yields insight into how consistent these magnitudes are and roughly translates to the *velocity* of product activity on a shelf. 
+This metric determines the magnitude of product activity by first counting the number of interactions with a product (product taken, product returned) during a 1 second interval. This is useful in understanding how much activity a particular shelf has. Additionally computing the non-negative difference between these magnitudes yields insight into how consistent these magnitudes are and roughly translates to the *velocity* of product activity on a shelf. 
 
 ![Grafana Dash](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/cola/docs/images/grafana-cola.png)
 
