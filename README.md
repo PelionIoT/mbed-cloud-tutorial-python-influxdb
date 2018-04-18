@@ -7,7 +7,8 @@ Note: The retailer does not care about how many products are sold to customers a
 Instead they want metrics on how much customers interact with products in stores before deciding to purchase or return an item to the shelves.
 ![Shopping](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/cola/docs/images/shopping.png)
 
-In this tutorial we will BLAH
+In this tutorial we will build an example service for analyzing and visualizing customer interaction with a product. 
+This includes simulating a smart shelf using an Mbed Cloud Linux Client, writing a simple proxy application for pulling values from Mbed Cloud and storing them in an arbitrary time series database, and configuring a visualization platform for analytics.
 
 ## Prerequisites 
 
