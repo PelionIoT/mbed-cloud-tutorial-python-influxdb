@@ -5,7 +5,7 @@ A retail chain wants more insight in how product placement correlates to custome
 Each shelf tracks how many items it contains, and should send this information to a server every time an item is added or removed.
 Note: The retailer does not care about how many products are sold to customers as this is trivially found from checkout systems. 
 Instead they want metrics on how much customers interact with products in stores before deciding to purchase or return an item to the shelves.
-![Shopping](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/cola/docs/images/shopping.png)
+![Shopping](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/master/docs/images/shopping.png)
 
 In this tutorial we will build an example service for analyzing and visualizing customer interaction with a product. 
 This includes simulating a smart shelf using an Mbed Cloud Linux Client, writing a simple proxy application for pulling values from Mbed Cloud and storing them in an arbitrary time series database, and configuring a visualization platform for analytics.
@@ -30,7 +30,7 @@ Additionally, we need to present these readings in a meaningful way to the analy
 Here we arbitrarily pick InfluxDB for storing our time series values and Grafana for visualization, but we could have chosen from any combination of time series databases and visualization platforms.
 
 
-![Platform overview](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/cola/docs/images/cola-overview.png)
+![Platform overview](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/master/docs/images/cola-overview-trimmed.png)
 
 ### Capturing this structure in microservices
 
@@ -139,7 +139,7 @@ Finally we can add a dashboard
 
 This metric determines the magnitude of product activity by first counting the number of interactions with a product (product taken, product returned) during a 1 second interval. This is useful in understanding how much activity a particular shelf has. Additionally computing the non-negative difference between these magnitudes yields insight into how consistent these magnitudes are and roughly translates to the *velocity* of product activity on a shelf. 
 
-![Grafana Dash](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/cola/docs/images/grafana-cola.png)
+![Grafana Dash](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb/blob/master/docs/images/grafana-cola.png)
 
 ## Discussion
 
