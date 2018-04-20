@@ -12,6 +12,7 @@ This includes simulating a smart shelf using an Mbed Cloud Linux Client, writing
 
 ## Prerequisites 
 
+- [Tutorial code](https://github.com/ARMmbed/mbed-cloud-tutorial-python-influxdb)
 - [Docker](https://docs.docker.com/install/#supported-platforms)
 
 Note for Windows users, you may need to enable [Shared Drives](https://docs.docker.com/docker-for-windows/#shared-drives) for Docker to work correctly.
