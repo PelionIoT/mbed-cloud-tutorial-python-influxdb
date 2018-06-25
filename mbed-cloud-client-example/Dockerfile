@@ -17,28 +17,13 @@ RUN apt-get install -y \
     cmake
 
 
-
-# SSH handling is a workaround to pull in private repos. This will dissapear when cloud is public
-# Make ssh dir
-RUN mkdir /root/.ssh/
-
-# Copy over private key, and set permissions
-ADD id_rsa /root/.ssh/id_rsa
-RUN chmod 400 /root/.ssh/id_rsa
-
-# Create known_hosts
-RUN touch /root/.ssh/known_hosts
-# Add rsa key
-RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
-
 # Install mbed tools
 RUN pip install mbed-cli click requests
 
 # Configure Git 
-RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
+#RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
 RUN git clone https://github.com/armmbed/cola-tutorial.git
 WORKDIR /cola-tutorial
-RUN git checkout update
 
 # Size Helping as these are not used in Linux
 RUN rm easy-connect.lib
@@ -46,7 +31,7 @@ RUN rm storage-selector.lib
 RUN rm mbed-os.lib
 
 RUN mbed config root .
-RUN mbed deploy --protocol ssh
+RUN mbed deploy --protocol https
 
 # Add developer certificate from user directory to project
 ADD mbed_cloud_dev_credentials.c .

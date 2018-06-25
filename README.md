@@ -99,8 +99,7 @@ def product_count_callback(device_id, path, current_value):
 ## Setup and run
 
 1. Add your Mbed Cloud `API_KEY` to `webapp/settings/development.py`.
-1. Add your `id_rsa` and `mbed_cloud_dev_credentials.c` file to the mbed-cloud-client-example directory. [Generate id_rsa](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/#platform-windows) and be sure to add it to Github. You can get `mbed_cloud_dev_credentials.c` from the cloud portal. *NOTE*: please make sure `id_rsa` is not password protected.
-
+1. Add your `mbed_cloud_dev_credentials.c` to the `mbed-cloud-client-example/` directory.
 1. Now run the following in the root of your project:
 
 ```
