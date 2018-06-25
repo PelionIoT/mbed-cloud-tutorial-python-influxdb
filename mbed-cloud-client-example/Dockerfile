@@ -1,19 +1,21 @@
-FROM frolvlad/alpine-glibc
+FROM ubuntu:14.04
 
 MAINTAINER Michael Bartling "michael.bartling@arm.com"
 
-# Install software 
-RUN apk add --update \
+RUN apt-get update
+RUN apt-get install -y \
     rng-tools \
     git \
     mercurial \
     python \
+    python-pip \
     perl \
-    py-pip \
-    build-base \
     python-dev \
+    build-essential \
     openssh-client \
+    libpthread-stubs0-dev \
     cmake
+
 
 
 # SSH handling is a workaround to pull in private repos. This will dissapear when cloud is public
@@ -36,6 +38,7 @@ RUN pip install mbed-cli click requests
 RUN git config --global url.ssh://git@github.com/.insteadOf https://github.com/
 RUN git clone https://github.com/armmbed/cola-tutorial.git
 WORKDIR /cola-tutorial
+RUN git checkout update
 
 # Size Helping as these are not used in Linux
 RUN rm easy-connect.lib
