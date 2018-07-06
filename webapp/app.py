@@ -83,10 +83,9 @@ id_num_db = {}
 
 def handleSubscribe(device_id, path, current_value):
     """On change in subscribed resource, dump data to InfluxDB."""
-    logging.error("HERE %s" % device_id)
     now = datetime.utcnow()
     id_num = id_num_db[device_id]
-    logging.error("DONE GETTING VALUE %s %s" % (device_id, id_num))
+    logging.debug("Received updated value from %s %s" % (device_id, id_num))
 
     json_body = [
         {
@@ -103,7 +102,6 @@ def handleSubscribe(device_id, path, current_value):
         }
     ]
 
-    logging.error("Writing to DB")
     db.write_points(json_body)
 
 
