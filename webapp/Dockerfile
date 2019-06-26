@@ -1,4 +1,4 @@
-FROM python:jessie
+FROM python:stretch
 
 MAINTAINER Michael Bartling "michael.bartling@arm.com"
 
